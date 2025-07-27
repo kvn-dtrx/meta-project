@@ -1,0 +1,42 @@
+# ---
+# begin: .gitignore <- dia-project
+# ---
+
+# ---
+
+# Base
+
+# macOS
+._*
+.AppleDouble
+.DS_Store
+.LSOverride
+.Spotlight-V100
+.Trashes
+Icon[[]]
+
+# Linux
+.nfs*
+*~
+
+# Windows
+$RECYCLE.BIN/
+Desktop.ini
+ehthumbs.db
+Thumbs.db
+
+# Logs and temporary files
+*.bak
+*.log
+*.swo
+*.swp
+*.tmp
+log/
+logs/
+tmp/
+
+# ---
+
+# ---
+# end: .gitignore <- dia-project
+# ---
