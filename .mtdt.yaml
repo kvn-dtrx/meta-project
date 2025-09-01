@@ -1,0 +1,7 @@
+project:
+  name: Meta Project
+  description: One project to rule them all
+  github: https://github.com/kvn-dtrx/meta-project
+  authors:
+    - name: Kvn Dtrx
+      mail: kvn.dtrx+git@protonmail.ch
