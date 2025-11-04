@@ -1,3 +1,0 @@
-["gitignore"]
-sources = ["base.ignore"]
-target = ".gitignore"
