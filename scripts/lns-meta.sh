@@ -4,7 +4,8 @@
 # description:
 # ---
 
-set -e
+set -o errexit
+set -o nounset
 
 TARGET_DIR="${HOME}/data/projects"
 
