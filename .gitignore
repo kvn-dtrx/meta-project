@@ -1,4 +1,10 @@
 # ---
+# title: Gitignore for Meta Project
+# ---
+
+# ---
+
+# ---
 # begin: .gitignore <- dia-project
 # ---
 
@@ -27,6 +33,7 @@ Thumbs.db
 
 # Logs and temporary files
 *.bak
+*.bak[0-9]*
 *.log
 *.swo
 *.swp
@@ -34,6 +41,7 @@ Thumbs.db
 log/
 logs/
 tmp/
+cache/
 
 # ---
 

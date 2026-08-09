@@ -1,7 +1,10 @@
 #!/usr/bin/env sh
 
 # ---
-# description: Sets up state directories.
+# description: >-
+#   Sets up state directories
+# ---
+
 # ---
 
 set -o errexit

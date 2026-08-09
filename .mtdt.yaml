@@ -1,7 +1,13 @@
 project:
+  id: df137ffa-6fdf-482f-b8c2-ba9d3bb2a471
   name: Meta Project
-  description: One project to rule them all
-  github: https://github.com/kvn-dtrx/meta-project
+  description: >-
+    One project to rule them all
   authors:
     - name: Kvn Dtrx
       mail: kvn.dtrx+git@protonmail.ch
+  license: null
+forges:
+  github:
+    url: https://github.com/kvn-dtrx/meta-project
+    visibility: public
