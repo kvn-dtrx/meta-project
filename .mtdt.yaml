@@ -6,7 +6,10 @@ project:
   authors:
     - name: Kvn Dtrx
       mail: kvn.dtrx+git@protonmail.ch
-  license: null
+  license:
+    type: MIT
+    year: 2025
+    file: LICENSE.txt
 forges:
   github:
     url: https://github.com/kvn-dtrx/meta-project

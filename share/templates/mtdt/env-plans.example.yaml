@@ -1,0 +1,19 @@
+# ---
+# title: example mtdt env plans (public template)
+# ---
+#
+# Copy into meta-project-annex as src/mtdt/env-plans.yaml. Pointers only —
+# values stay in ${XDG_DATA_HOME}/envs/<from>.sh.gpg via retrieve-envvar.
+
+# ---
+
+plans:
+  00000000-0000-0000-0000-000000000000:
+    # Example Project
+    target: .env
+    vars:
+      - key: GOOGLE_API_KEY
+        from: google
+      - key: YT_API_KEY
+        from: google
+        var: YOUTUBE_API_KEY

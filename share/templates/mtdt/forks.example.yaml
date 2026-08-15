@@ -1,0 +1,15 @@
+# ---
+# title: example mtdt fork overlays (public template)
+# ---
+#
+# Copy into meta-project-annex as src/mtdt/forks.yaml and replace with real
+# project.id keys. Do not commit personal fork URLs to the public stem.
+
+# ---
+
+forks:
+  00000000-0000-0000-0000-000000000000:
+    # Example Project
+    github:
+      url: https://github.com/example/example-fork
+      visibility: private

@@ -25,7 +25,7 @@ usage() {
 }
 
 list_workspaces() {
-    if ! ls "${workspaces_dir}"/*.code-workspace >/dev/null 2>&1; then
+    if ! ls "${workspaces_dir}"/*.code-workspace > /dev/null 2>&1; then
         printf 'no workspaces in %s\n' "${workspaces_dir}" >&2
         return 1
     fi
@@ -46,11 +46,11 @@ resolve_opener() {
         printf '%s' "${WS_OPENER}"
         return
     fi
-    if command -v cursor >/dev/null 2>&1; then
+    if command -v cursor > /dev/null 2>&1; then
         printf 'cursor'
         return
     fi
-    if command -v code >/dev/null 2>&1; then
+    if command -v code > /dev/null 2>&1; then
         printf 'code'
         return
     fi
