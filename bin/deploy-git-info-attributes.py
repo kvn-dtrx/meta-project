@@ -17,7 +17,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from mtdt.walk import annex_root, iter_checkouts, log_error, log_info
+from meta_project.walk import annex_root, iter_git_checkouts, log_error, log_info
 
 BEGIN = "# meta-project:begin repolicy"
 END = "# meta-project:end repolicy"
@@ -77,7 +77,7 @@ def main() -> int:
     roots = args.roots or [Path.home() / "data/projects"]
     stale = 0
 
-    for checkout, _project_id in iter_checkouts(roots):
+    for checkout in iter_git_checkouts(roots):
         try:
             checkout_git_dir = git_dir(checkout)
             if checkout_git_dir is None:

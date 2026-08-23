@@ -2,7 +2,7 @@
 
 # ---
 # description: >-
-#   Apply meta-project-annex space-mounts.yaml: ensure <space>/mnt/.gitkeep and
+#   Apply meta-project mounts.yaml: ensure <space>/mnt/.gitkeep and
 #   link mnt/<link> → the catalogued data-stem checkout. Symlinks are local
 #   (gitignore mnt/*; force-add .gitkeep).
 # ---
@@ -20,7 +20,7 @@ from pathlib import Path
 _REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_REPO / "src"))
 
-from mtdt.walk import (  # noqa: E402
+from meta_project.walk import (  # noqa: E402
     iter_checkouts,
     load_yaml_mapping,
     log_error,
@@ -39,7 +39,9 @@ STAGES = ("permanent", "staged", "running", "archive", "review")
 
 
 def projects_root() -> Path:
-    raw = os.environ.get("MTDT_PROJECTS_ROOT", "").strip()
+    raw = os.environ.get("META_PROJECTS_ROOT", "").strip()
+    if not raw:
+        raw = os.environ.get("MTDT_PROJECTS_ROOT", "").strip()
     return Path(raw).expanduser() if raw else DEFAULT_PROJECTS
 
 
@@ -246,7 +248,7 @@ def load_mounts() -> dict:
     try:
         catalog = load_yaml_mapping(path)
     except FileNotFoundError:
-        log_error(f"space-mounts catalog not found: {path}")
+        log_error(f"mount catalogue not found: {path}")
         raise SystemExit(1) from None
     mounts = catalog.get("mounts")
     if not isinstance(mounts, dict):
@@ -276,7 +278,7 @@ def resolve_space_arg(target: str | None, root: Path) -> Path:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Link space mnt/<link> from meta-project-annex space-mounts.yaml "
+            "Link space mnt/<link> from the meta-project mount catalogue "
             "(by space project.id)."
         )
     )
@@ -288,7 +290,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--all",
         action="store_true",
-        help="apply every catalog entry (scan MTDT_PROJECTS_ROOT)",
+        help="apply every catalog entry (scan META_PROJECTS_ROOT)",
     )
     parser.add_argument(
         "--data",
@@ -354,7 +356,7 @@ def main(argv: list[str] | None = None) -> int:
     entry = mounts.get(space_id)
     if not isinstance(entry, dict):
         log_error(
-            f"{space_dir}: no space-mounts entry for {space_id} "
+            f"{space_dir}: no mount entry for {space_id} "
             f"(catalog {space_mounts_catalog_path()})"
         )
         return 1

@@ -2,7 +2,7 @@
 
 # ---
 # description: >-
-#   Upsert planned env keys into checkouts from meta-project env-plans.yaml
+#   Upsert planned env keys into checkouts from meta-project envs.yaml
 #   (by project.id). Values come from XDG env phrase files via retrieve-envvar.
 # ---
 
@@ -19,16 +19,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-try:
-    import yaml
-except ImportError as exc:  # pragma: no cover
-    sys.stderr.write("deploy-env-plans requires PyYAML\n")
-    raise SystemExit(1) from exc
-
 _REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_REPO / "src"))
 
-from mtdt.walk import (  # noqa: E402
+from meta_project.walk import (  # noqa: E402
     env_plans_catalog_path,
     iter_checkouts,
     load_yaml_mapping,
@@ -171,8 +165,7 @@ def plan_vars(entry: dict) -> list[tuple[str, str, str]]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Upsert env keys from meta-project env-plans.yaml "
-            "(values via retrieve-envvar)."
+            "Upsert env keys from meta-project envs.yaml (values via retrieve-envvar)."
         )
     )
     parser.add_argument(
@@ -192,7 +185,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         catalog = load_yaml_mapping(plans_file)
     except FileNotFoundError:
-        log_error(f"env-plans catalog not found: {plans_file}")
+        log_error(f"environment catalogue not found: {plans_file}")
         return 1
 
     plans = catalog.get("plans")

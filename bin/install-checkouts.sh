@@ -12,7 +12,9 @@ set -o nounset
 
 self="$(CDPATH='' cd -- "$(dirname "${0}")/.." && pwd)"
 
-if [ -n "${MTDT_PROJECTS_ROOT:-}" ]; then
+if [ -n "${META_PROJECTS_ROOT:-}" ]; then
+    set -- "${META_PROJECTS_ROOT}"
+elif [ -n "${MTDT_PROJECTS_ROOT:-}" ]; then
     set -- "${MTDT_PROJECTS_ROOT}"
 else
     set -- \

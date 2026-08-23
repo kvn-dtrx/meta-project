@@ -16,4 +16,4 @@ The projects are arranged according to their respective stages of advancement:
 
 ## Colophon
 
-**Authors:** The Author
+**Authors:** [Kvn Dtrx](https://github.com/kvn-dtrx)

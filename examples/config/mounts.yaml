@@ -1,14 +1,14 @@
 # ---
 # title: example space data mounts (public template)
 # ---
-#
-# Copy into meta-project-annex as src/mtdt/space-mounts.yaml.
+
+# Install privately as ~/.config/meta-project/mounts.yaml.
 # Keys are the *-space project.id.
-#
+
 # Single mount:
 #   link: data          # optional (default data)
 #   data: { id, stem }
-#
+
 # Several mounts (e.g. notes-space):
 #   links:
 #     - link: mint-notes
@@ -26,10 +26,10 @@ mounts:
   00000000-0000-0000-0000-000000000010:
     # Example Notes Space (several collections)
     links:
-      - link: mint-notes
+      - link: trivial-notes
         data:
           id: 00000000-0000-0000-0000-000000000011
-          stem: mint-notes
+          stem: trivial-notes
       - link: personal-notes
         data:
           id: 00000000-0000-0000-0000-000000000012

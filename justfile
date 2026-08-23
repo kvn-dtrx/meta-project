@@ -7,29 +7,29 @@
 set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
 
 # Default tree to scan for .mtdt.yaml / space checkouts
-projects := env_var_or_default("MTDT_PROJECTS_ROOT", home_directory() / "data" / "projects")
+projects := env_var_or_default("META_PROJECTS_ROOT", env_var_or_default("MTDT_PROJECTS_ROOT", home_directory() / "data" / "projects"))
 
 # Shows available recipes
 default:
     @just --list --unsorted
 
-# Writes .mtdt.local.yaml from annex forks catalog
-deploy-mtdt-local *args:
-    @bin/deploy-mtdt-local.py {{ if args == "" { quote(projects) } else { args } }}
-
-# Reports drift of .mtdt.local.yaml vs forks catalog
-check-mtdt-local *args:
-    @bin/deploy-mtdt-local.py --check {{ if args == "" { quote(projects) } else { args } }}
-
-# Upserts planned .env keys from annex env-plans (via retrieve-envvar)
+# Upserts planned .env keys from the private env catalogue
 deploy-env-plans *args:
     @bin/deploy-env-plans.py {{ if args == "" { quote(projects) } else { args } }}
 
-# Reports drift of planned .env keys vs env-plans catalog
+# Reports drift of planned .env keys vs the env catalogue
 check-env-plans *args:
     @bin/deploy-env-plans.py --check {{ if args == "" { quote(projects) } else { args } }}
 
-# Links one space mnt/data from annex space-mounts (STEM, path, or cwd)
+# Reconciles private mirror remotes from the remote catalogue
+deploy-git-remotes *args:
+    @bin/deploy-git-remotes.py {{ if args == "" { quote(projects) } else { args } }}
+
+# Reports mirror remote drift against the remote catalogue
+check-git-remotes *args:
+    @bin/deploy-git-remotes.py --check {{ if args == "" { quote(projects) } else { args } }}
+
+# Links one space mnt/data from the private mount catalogue
 mount-space *args:
     @bin/mount-space.py {{args}}
 

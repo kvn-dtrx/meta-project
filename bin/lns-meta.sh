@@ -17,7 +17,7 @@ script_path="$(realpath "${0}")"
 script_dir="$(dirname "${script_path}")"
 repo_dir="$(git -C "${script_dir}" rev-parse --show-toplevel)"
 
-find -L "${repo_dir}"/src -mindepth 1 |
+find -L "${repo_dir}"/src/wire -mindepth 1 -maxdepth 1 |
     while IFS="" read -r source; do
         dst_name="$(basename "${source}")"
         target="${DST_DIR}/${dst_name}"

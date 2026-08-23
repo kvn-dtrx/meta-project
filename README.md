@@ -3,27 +3,29 @@
 ## Synopsis
 
 One project to rule them all: layout of `~/data/projects`, multi-root editor
-workspaces, and deploy CLIs for clone-local catalogs.
+workspaces, environment plans, space mounts, private mirror remotes, and local Git policy.
 
-Personal catalogs (fork overlays, env plans) and ops docs live in the private
+Personal catalogues and ops docs live in the private
 sibling [meta-project-annex](https://github.com/kvn-dtrx/meta-project-annex).
+The separate [mtdt](https://github.com/kvn-dtrx/mtdt) project owns metadata
+parsing, discovery, and `.mtdt.local.yaml` deployment.
 
 ## Layout
 
 ```
-src/                        projects tree definition (bin/lns-meta.sh)
-src/mtdt/walk.py            shared checkout walk for deploy CLIs
-share/templates/mtdt/       example catalog templates (not live data)
+src/wire/                   projects tree definition (bin/lns-meta.sh)
+src/meta_project/walk.py    mtdt command adapter and private config paths
+examples/config/            public env, mount, and remote catalogue examples
 Makefile                    make install → every checkout
 bin/
   install-checkouts.sh   the projects-tree make install loop
   lns-meta.sh
   setup-state-dirs.sh
   ws.sh
-  deploy-mtdt-local.py
   deploy-env-plans.py
+  deploy-git-remotes.py
   deploy-git-info-attributes.py
-  mount-space.py         apply annex space-mounts.yaml → <space>/mnt/data
+  mount-space.py         apply private mounts.yaml → <space>/mnt/data
 workspaces/                 versioned *.code-workspace files
 cache/sessions/             local editor sessions (gitignored)
 ```
@@ -32,9 +34,9 @@ cache/sessions/             local editor sessions (gitignored)
 
 | Locus | Owns |
 | --- | --- |
-| **meta-project** (public) | deploy CLIs, templates, layout tooling, checkout `make install` loop |
-| **meta-project-annex** (private) | live `forks.yaml` / `env-plans.yaml`, personal docs |
-| **mtdt** | `.mtdt.yaml` schema, resolve, validate, forge checks |
+| **meta-project** (public) | environment/mount deploy CLIs, layout tooling, checkout `make install` loop |
+| **meta-project-annex** (private) | live personal configuration and ops docs |
+| **mtdt** | metadata parsing/discovery, schema, overlays, validation, forge checks |
 | **krypta** / XDG `envs/*.sh.gpg` | secret material (`retrieve-envvar`) |
 
 ## Install checkouts
@@ -49,15 +51,18 @@ Before installing checkouts, this also merges the private annex catalog at
 `src/git/info/attributes` into each checkout's unversioned
 `.git/info/attributes`. Existing unrelated local attributes are preserved.
 
-Walks `~/data/projects/permanent` and `staged` (or `MTDT_PROJECTS_ROOT`) for `.mtdt.yaml`, runs `make install` in each checkout that has that target, and skips this repo so it cannot recurse.
+Walks `~/data/projects/permanent` and `staged` (or `META_PROJECTS_ROOT`) for
+`.mtdt.yaml`, runs `make install` in each checkout that has that target, and
+skips this repo so it cannot recurse. `MTDT_PROJECTS_ROOT` remains a temporary
+compatibility alias.
 
 ## Install deploy CLIs
 
 ```bash
-ln -sf ~/data/projects/permanent/meta-project/bin/deploy-mtdt-local.py \
-  ~/.local/bin/deploy-mtdt-local
 ln -sf ~/data/projects/permanent/meta-project/bin/deploy-env-plans.py \
   ~/.local/bin/deploy-env-plans
+ln -sf ~/data/projects/permanent/meta-project/bin/deploy-git-remotes.py \
+  ~/.local/bin/deploy-git-remotes
 ln -sf ~/data/projects/permanent/meta-project/bin/mount-space.py \
   ~/.local/bin/mount-space
 ```
@@ -66,34 +71,48 @@ Or from this repo (no PATH install required):
 
 ```bash
 just --list
-just deploy-mtdt-local          # default: ~/data/projects
-just check-mtdt-local
 just deploy-env-plans
 just check-env-plans
+just deploy-git-remotes
+just check-git-remotes
 just mount-space-all
 just check-space-mounts
 just mount-space contacts
 ```
 
-Needs `PyYAML`. Catalogs default to
-`${META_PROJECT_ANNEX:-~/data/projects/permanent/meta-project-annex}/src/mtdt/`.
-Override with `META_PROJECT_ANNEX`, `MTDT_FORKS_FILE`, or `MTDT_ENV_PLANS_FILE`.
+Environment and mount deployment needs `PyYAML` plus the installed
+`mtdt-project-id` / `mtdt-list-projects` commands. Git-policy and checkout
+installation remain independently bootstrappable. Catalogues default to
+`${XDG_CONFIG_HOME:-~/.config}/meta-project/`. During migration, sources below
+`${META_PROJECT_ANNEX}/src/wire/meta-project/config/` and the former Annex
+paths remain readable.
 
 ```bash
-deploy-mtdt-local ~/data/projects
-deploy-mtdt-local --check ~/data/projects
 deploy-env-plans ~/data/projects
 deploy-env-plans --check ~/data/projects
 ```
 
-Seed a private annex from `share/templates/mtdt/*.example.yaml` if needed.
+Seed a private annex from `examples/config/*.yaml` if needed. Override the
+environment catalogue with `META_PROJECT_ENVS_FILE`; `MTDT_ENV_PLANS_FILE`
+remains a compatibility alias.
+
+## Private Git mirror remotes
+
+Operational remotes such as `mirror-glab` and `mirror-nas` are catalogued privately in `~/.config/meta-project/remotes.yaml`, keyed by the stable `project.id`. They are written only to each checkout's local `.git/config`; public `.mtdt.yaml` files remain free of private infrastructure and mirror-role policy.
+
+```bash
+just check-git-remotes
+just deploy-git-remotes
+```
+
+Only explicitly catalogued names beginning with `mirror-` are managed. Unlisted remotes are preserved. Override the catalogue with `META_PROJECT_REMOTES_FILE`.
 
 ## Space mounts (`mnt/data`)
 
 Each `*-space` repo keeps `mnt/` (`.gitkeep` force-added). **What** mounts
 **where** is catalogued in private meta-project-annex
-`src/mtdt/space-mounts.yaml` (keyed by space `project.id` → data `id` /
-`stem`). Public template: `share/templates/mtdt/space-mounts.example.yaml`.
+`~/.config/meta-project/mounts.yaml` (keyed by space `project.id` → data `id` /
+`stem`). Public template: `examples/config/mounts.yaml`.
 
 ```text
 contacts-space/
@@ -118,8 +137,9 @@ mount-space --all                    # every catalog entry
 mount-space --check --all
 ```
 
-Overrides: `--data DIR`, `MTDT_SPACE_MOUNTS_FILE`, `MTDT_PROJECTS_ROOT`,
-`META_PROJECT_ANNEX`.
+Overrides: `--data DIR`, `META_PROJECT_MOUNTS_FILE`, `META_PROJECTS_ROOT`,
+and `META_PROJECT_ANNEX`. The former `MTDT_SPACE_MOUNTS_FILE` and
+`MTDT_PROJECTS_ROOT` names remain compatibility aliases.
 
 ## Workspaces
 

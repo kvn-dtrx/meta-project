@@ -1,8 +1,8 @@
 # ---
 # title: example mtdt env plans (public template)
 # ---
-#
-# Copy into meta-project-annex as src/mtdt/env-plans.yaml. Pointers only —
+
+# Install privately as ~/.config/meta-project/envs.yaml. Pointers only —
 # values stay in ${XDG_DATA_HOME}/envs/<from>.sh.gpg via retrieve-envvar.
 
 # ---
