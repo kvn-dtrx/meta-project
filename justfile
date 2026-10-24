@@ -21,13 +21,41 @@ deploy-env-plans *args:
 check-env-plans *args:
     @bin/deploy-env-plans.py --check {{ if args == "" { quote(projects) } else { args } }}
 
-# Reconciles private mirror remotes from the remote catalogue
+# Reconciles forge remotes and the local NAS depot remote
 deploy-git-remotes *args:
     @bin/deploy-git-remotes.py {{ if args == "" { quote(projects) } else { args } }}
 
-# Reports mirror remote drift against the remote catalogue
+# Reports forge and local NAS depot remote drift
 check-git-remotes *args:
     @bin/deploy-git-remotes.py --check {{ if args == "" { quote(projects) } else { args } }}
+
+# Uploads missing GitLab avatars from repository-root logo.png files
+deploy-gitlab-avatars *args:
+    @bin/deploy-gitlab-avatars.py {{ if args == "" { quote(projects) } else { args } }}
+
+# Reports GitLab projects missing an avatar where a root logo.png exists
+check-gitlab-avatars *args:
+    @bin/deploy-gitlab-avatars.py --check {{ if args == "" { quote(projects) } else { args } }}
+
+# Reconciles repository-local LFS storage below MY_NAS_DATA_DIR
+deploy-git-lfs-storage *args:
+    @bin/deploy-git-lfs-storage.py {{ if args == "" { quote(projects) } else { args } }}
+
+# Reports local LFS storage drift below MY_NAS_DATA_DIR
+check-git-lfs-storage *args:
+    @bin/deploy-git-lfs-storage.py --check {{ if args == "" { quote(projects) } else { args } }}
+
+# Checks GitHub default-branch rulesets; pass --fix to reconcile through my-gh admin
+check-github-rulesets *args:
+    @bin/check-forge-rulesets.py --forge github {{args}} {{quote(projects)}}
+
+# Checks GitLab branch/project/push protections; pass --fix for my-glab admin
+check-gitlab-rulesets *args:
+    @bin/check-forge-rulesets.py --forge gitlab {{args}} {{quote(projects)}}
+
+# Checks both forge adapters; --fix requests both administrative tokens
+check-forge-rulesets *args:
+    @bin/check-forge-rulesets.py --forge all {{args}} {{quote(projects)}}
 
 # Links one space mnt/data from the private mount catalogue
 mount-space *args:
@@ -52,3 +80,7 @@ setup-state-dirs:
 # Opens or lists Cursor/VS Code multi-root workspaces
 ws *args:
     @bin/ws.sh {{args}}
+
+# Lists and searches documented Just recipes and Make targets across repositories
+repo-recipes *args:
+    @bin/repo-recipes.py {{args}}

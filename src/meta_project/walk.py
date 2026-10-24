@@ -92,17 +92,6 @@ def space_mounts_catalog_path() -> Path:
     )
 
 
-def remotes_catalog_path() -> Path:
-    raw = os.environ.get("META_PROJECT_REMOTES_FILE", "").strip()
-    if raw:
-        return Path(raw).expanduser()
-    candidates = (
-        config_home() / "meta-project" / "remotes.yaml",
-        annex_root() / "src/wire/meta-project/config/remotes.yaml",
-    )
-    return next((path for path in candidates if path.is_file()), candidates[0])
-
-
 def load_yaml_mapping(path: Path) -> dict:
     if not path.is_file():
         raise FileNotFoundError(path)
@@ -133,6 +122,30 @@ def project_id_from_mtdt(path: Path) -> str | None:
         text=True,
     )
     return proc.stdout.strip() if proc.returncode == 0 else None
+
+
+def load_effective_metadata(project_dir: Path) -> dict:
+    """Load metadata through mtdt so local forge overlays take precedence."""
+    command = _mtdt_tool("MTDT_RESOLVE_COMMAND", "resolve-mtdt")
+    metadata_path = project_dir / ".mtdt.yaml"
+    proc = subprocess.run(
+        [command, str(metadata_path)],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        detail = proc.stderr.strip() or f"exit status {proc.returncode}"
+        raise RuntimeError(f"resolve-mtdt failed for {project_dir}: {detail}")
+    try:
+        data = yaml.safe_load(proc.stdout)
+    except yaml.YAMLError as exc:
+        raise RuntimeError(
+            f"resolve-mtdt returned invalid YAML for {project_dir}"
+        ) from exc
+    if not isinstance(data, dict):
+        raise RuntimeError(f"resolve-mtdt returned no mapping for {project_dir}")
+    return data
 
 
 def iter_git_checkouts(roots: list[Path]) -> Iterator[Path]:

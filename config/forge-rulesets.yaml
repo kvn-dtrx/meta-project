@@ -1,0 +1,23 @@
+# ---
+# title: Shared forge ruleset profiles
+# ---
+
+schema-version: 1
+# Every effective mtdt project with a non-null forges.github.url inherits this
+# profile on GitHub and on its derived GitLab mirror. A forge-specific
+# ruleset-profile can select another profile or none.
+default-profile: protected-default
+profiles:
+  protected-default:
+    # GitHub uses this stable managed name. GitLab maps the same policy to its
+    # protected-branch, project, and push-rule APIs.
+    managed-name: mtdt/default-branch
+    target: default-branch
+    enforcement: active
+    bypass: []
+    require:
+      signed-commits: true
+      linear-history: true
+    prohibit:
+      deletion: true
+      force-push: true

@@ -2,8 +2,8 @@
 
 # ---
 # description: >-
-#   Runs make install in each permanent/staged checkout that has that
-#   target. Skips this repo so make install here cannot recurse.
+#   Runs a selected installation target in each permanent/staged checkout that
+#   declares it. Skips this repo so the meta target cannot recurse.
 # ---
 
 # ---
@@ -11,6 +11,15 @@
 set -o nounset
 
 self="$(CDPATH='' cd -- "$(dirname "${0}")/.." && pwd)"
+target="${1:-install-user}"
+
+case "${target}" in
+    install-user | setup-dev) ;;
+    *)
+        printf 'Unsupported checkout installation target: %s\n' "${target}" >&2
+        exit 2
+        ;;
+esac
 
 if [ -n "${META_PROJECTS_ROOT:-}" ]; then
     set -- "${META_PROJECTS_ROOT}"
@@ -62,11 +71,11 @@ while IFS= read -r mtdt; do
     else
         continue
     fi
-    grep -q '^install[[:space:]]*:' "${makefile}" || continue
+    grep -q "^${target}[[:space:]]*:" "${makefile}" || continue
 
-    printf '>>> make install: %s\n' "${dir}"
+    printf '>>> make %s: %s\n' "${target}" "${dir}"
     ran=$((ran + 1))
-    if make -C "${dir}" install; then
+    if make -C "${dir}" "${target}"; then
         :
     else
         printf '<<< failed: %s\n' "${dir}" >&2
@@ -77,13 +86,13 @@ ${mtdt_files}
 EOF
 
 if [ "${ran}" -eq 0 ]; then
-    printf 'No checkouts with an install target\n' >&2
+    printf 'No checkouts with an %s target\n' "${target}" >&2
     exit 1
 fi
 if [ "${failures}" -gt 0 ]; then
-    printf 'install-checkouts: %s failure(s) of %s\n' \
-        "${failures}" "${ran}" >&2
+    printf 'install-checkouts %s: %s failure(s) of %s\n' \
+        "${target}" "${failures}" "${ran}" >&2
     exit 1
 fi
 
-printf 'install-checkouts: %s checkout(s) ok\n' "${ran}"
+printf 'install-checkouts %s: %s checkout(s) ok\n' "${target}" "${ran}"

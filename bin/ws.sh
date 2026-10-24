@@ -11,9 +11,23 @@
 set -o errexit
 set -o nounset
 
+find_mtdt_root() (
+    start="${1:-${PWD}}"
+    root="$(CDPATH='' cd -- "${start}" 2> /dev/null && pwd -P)" || return 1
+    while [ ! -f "${root}/.mtdt.yaml" ]; do
+        parent="$(dirname "${root}")"
+        if [ "${parent}" = "${root}" ]; then
+            printf 'No .mtdt.yaml found above %s\n' "${start}" >&2
+            return 1
+        fi
+        root="${parent}"
+    done
+    printf '%s\n' "${root}"
+)
+
 script_path="$(realpath "${0}")"
 script_dir="$(dirname "${script_path}")"
-repo_dir="$(git -C "${script_dir}" rev-parse --show-toplevel)"
+repo_dir="$(find_mtdt_root "${script_dir}")"
 workspaces_dir="${repo_dir}/workspaces"
 sessions_dir="${repo_dir}/cache/sessions"
 
